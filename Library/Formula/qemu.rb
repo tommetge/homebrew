@@ -29,4 +29,24 @@ class Qemu < Formula
     system "./configure", *args
     system "make install"
   end
+
+  def patches
+    # fixes lsi_soft_reset assertion
+    DATA
+  end
 end
+
+__END__
+diff --git a/hw/scsi/lsi53c895a.c b/hw/scsi/lsi53c895a.c
+index 22b8e98..6e22cc4 100644
+--- a/hw/scsi/lsi53c895a.c
++++ b/hw/scsi/lsi53c895a.c
+@@ -348,6 +348,7 @@ static void lsi_soft_reset(LSIState *s)
+     s->sbc = 0;
+     s->csbc = 0;
+     s->sbr = 0;
++    qbus_reset_all(&s->bus.qbus);
+     assert(QTAILQ_EMPTY(&s->queue));
+     assert(!s->current);
+ }
+
